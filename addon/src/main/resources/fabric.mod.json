@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "flyui",
+  "version": "0.1.0",
+  "name": "Fly UI",
+  "description": "Live web dashboard for the Connectome Fly mod: whole-brain activity, senses, motor outputs, vision, compass, learning and every internal variable, in your browser at http://127.0.0.1:8765/",
+  "authors": ["dnocoder"],
+  "contact": {
+    "sources": "https://github.com/dnocoder/fly-ui",
+    "issues": "https://github.com/dnocoder/fly-ui/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/flyui/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["io.github.dnocoder.flyui.FlyUiMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-lifecycle-events-v1": "*",
+    "fabric-networking-api-v1": "*"
+  },
+  "recommends": {
+    "connectomefly": "*"
+  }
+}
