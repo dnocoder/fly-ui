@@ -17,7 +17,7 @@ final class Config {
     /** Snapshots per second sent to the web page (1..20). */
     int sampleHz = 10;
     /** Vision frames per second for the fly being watched (1..20). */
-    int visionHz = 5;
+    int visionHz = 4;
     int visionWidth = 64;
     int visionHeight = 28;
     int visionRange = 32;

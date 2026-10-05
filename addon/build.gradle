@@ -1,0 +1,44 @@
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    // The sources call Minecraft by its intermediary names (net.minecraft.class_XXXX),
+    // the same names the game uses at runtime under Fabric, so the intermediary
+    // mappings double as the development mappings. This keeps the code buildable with
+    // plain javac against the game jar Fabric Loader writes (see tools/build-local.sh).
+    mappings "net.fabricmc:intermediary:${project.minecraft_version}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
+    modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
+    modImplementation fabricApi.module('fabric-networking-api-v1', project.fabric_version)
+    // Connectome Fly itself is reached only through reflection at runtime: no compile dependency.
+}
+
+processResources {
+    // the web page is served from inside the jar
+    from(rootProject.file('../web')) {
+        into 'web'
+    }
+    from(rootProject.file('../LICENSE')) {
+        rename { 'LICENSE_flyui' }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 17
+    it.options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

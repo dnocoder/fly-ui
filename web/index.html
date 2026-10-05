@@ -1,1 +1,143 @@
-<!doctype html><title>Fly UI</title>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fly UI: мозг мухи</title>
+  <meta name="description" content="Живая панель мозга плодовой мушки из мода Connectome Fly для Minecraft: 158 тысяч нейронов, чувства, движения, зрение, компас и память.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,500&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <header class="bar">
+    <span class="mark"><img src="favicon.svg" alt="" width="22" height="22">Fly UI</span>
+    <label class="flypick" hidden>Муха <select id="fly"></select></label>
+    <p id="where" class="where"></p>
+    <span id="status" class="status" role="status" aria-live="polite">Подключение…</span>
+    <button id="theme" class="ghost" type="button" aria-pressed="false">Тёмная тема</button>
+  </header>
+
+  <div id="notice" class="notice" hidden>
+    <p id="notice-text"></p>
+    <form id="connect" class="connect">
+      <label for="api">Адрес аддона</label>
+      <input id="api" name="api" type="url" value="http://127.0.0.1:8765" spellcheck="false">
+      <button type="submit">Подключиться</button>
+    </form>
+  </div>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="narration">
+      <div class="hero-main">
+        <p id="narration" class="narration">Ищем муху…</p>
+        <p id="speech" class="speech" hidden></p>
+        <dl id="vitals" class="vitals"></dl>
+
+        <figure class="well brain-well">
+          <canvas id="brain" role="img" aria-label="Карта всех нейронов мозга мухи, яркость показывает активность"></canvas>
+          <p id="brain-empty" class="well-empty" hidden></p>
+        </figure>
+        <div class="brain-foot">
+          <ul class="legend classes" id="classes"></ul>
+          <div class="controls" role="group" aria-label="Что показывать на карте">
+            <button type="button" class="seg" data-mode="rate" aria-pressed="true">Частота разрядов</button>
+            <button type="button" class="seg" data-mode="v" aria-pressed="false">Потенциал мембраны</button>
+            <label class="check"><input type="checkbox" id="labels" checked> Подписи</label>
+          </div>
+        </div>
+        <p class="note">Каждая точка — один из нейронов коннектома BANC. Расположение схематичное: нейроны сгруппированы по функции, а не по настоящим координатам. Чем чаще нейрон разряжается, тем ярче точка. Сенсорные клетки в модели не адаптируются, поэтому они вспыхивают с частотой своего канала.</p>
+      </div>
+
+      <aside class="hero-side">
+        <h2>Перед глазами</h2>
+        <p class="note">Панорама 330° вокруг головы, примерно как фасеточные глаза. Её строит аддон лучами в мир игры. Сам мозг получает не картинку, а сигналы ниже.</p>
+        <figure class="well"><canvas id="eye" role="img" aria-label="Панорама вокруг мухи"></canvas></figure>
+
+        <h3>Что мозг получает от глаз</h3>
+        <div class="mirror-head"><span>левый глаз</span><span>правый глаз</span></div>
+        <div id="visin" class="mirrors"></div>
+
+        <h3>Что она заметила рядом</h3>
+        <figure class="well"><canvas id="radar" role="img" aria-label="Карта замеченных объектов, направление взгляда вверх"></canvas></figure>
+        <ul class="legend shapes">
+          <li><i class="shape attract" aria-hidden="true"></i>привлекает</li>
+          <li><i class="shape avoid" aria-hidden="true"></i>отталкивает</li>
+          <li><i class="shape neutral" aria-hidden="true"></i>нейтрально</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="pair">
+      <div>
+        <h2>Чувства</h2>
+        <p class="note">Спайки во входных каналах мозга за последнюю минуту. Темнее — сильнее сигнал, шкала логарифмическая.</p>
+        <div class="heat"><canvas id="senses" role="img" aria-label="Активность сенсорных каналов во времени"></canvas></div>
+      </div>
+      <div>
+        <h2>Выходы мозга</h2>
+        <p class="note">Частота разрядов команд движения, мотонейронов и внутренних групп клеток. Подписи из описания мода.</p>
+        <div class="heat"><canvas id="outputs" role="img" aria-label="Активность выходов мозга во времени"></canvas></div>
+      </div>
+    </section>
+
+    <section class="trio">
+      <div>
+        <h2>Компас</h2>
+        <figure class="well"><canvas id="compass" role="img" aria-label="Кольцо клеток компаса и курс мухи"></canvas></figure>
+        <p id="compass-text" class="note"></p>
+      </div>
+      <div>
+        <h2>Память, награда, сон</h2>
+        <div id="learn-charts" class="charts"></div>
+      </div>
+      <div>
+        <h2>Тело и движение</h2>
+        <div id="body-charts" class="charts"></div>
+      </div>
+    </section>
+
+    <section class="circuits">
+      <div class="circuits-head">
+        <h2>Цепи из настоящих клеток</h2>
+        <div class="controls" role="group" aria-label="Какую цепь показать">
+          <button type="button" class="seg" data-circuit="escape" aria-pressed="true">Побег</button>
+          <button type="button" class="seg" data-circuit="steering" aria-pressed="false">Шаг и поворот</button>
+        </div>
+      </div>
+      <figure class="well"><canvas id="circuit" role="img" aria-label="Граф нейронной цепи"></canvas></figure>
+      <p id="circuit-note" class="note"></p>
+    </section>
+
+    <section class="readouts">
+      <div>
+        <h2>Показания мода</h2>
+        <p class="note">Строки, которые мод выводит в своём HUD. Значения на английском, как их пишет мод.</p>
+        <dl id="hud" class="hud"></dl>
+        <details class="raw">
+          <summary>Отладочная строка</summary>
+          <pre id="debug"></pre>
+        </details>
+      </div>
+      <div>
+        <h2>Все переменные</h2>
+        <input id="varsearch" class="search" type="search" placeholder="Найти переменную, например hunger или память" aria-label="Поиск переменной">
+        <div class="vars-wrap">
+          <table id="vars" class="vars">
+            <caption class="sr">Все внутренние переменные мухи</caption>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Fly UI показывает данные мода <a href="https://modrinth.com/mod/flyproject-mod">Connectome Fly</a> от flyproject.io (CC BY 4.0). Мозг мухи — коннектом BANC v888 (Codex, FlyWire). Fly UI распространяется по лицензии MIT, <a href="https://github.com/dnocoder/fly-ui">исходный код на GitHub</a>.</p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

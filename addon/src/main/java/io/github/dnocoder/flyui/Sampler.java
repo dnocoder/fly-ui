@@ -125,6 +125,7 @@ final class Sampler {
         flies.keySet().retainAll(seen);
         flyDims.keySet().retainAll(seen);
         visionLatest.keySet().retainAll(seen);
+        debugCache.keySet().retainAll(seen);
         j.endArray().endObject();
         publish(j.toString());
     }
@@ -137,8 +138,11 @@ final class Sampler {
             {"dragged", "isDragged"}, {"noGround", "noGroundBelow"},
             {"neuroLegs", "getNeuroLegs"}, {"neuroFlight", "getNeuroFlight"},
             {"speech", "getSpeech"}, {"bodyMode", "getBodyMode"}, {"animFlags", "animFlags"},
-            {"hud", "getHud"}, {"debug", "debugState"},
+            {"hud", "getHud"},
     };
+
+    /** The mod's debug strings are rebuilt once a second, not on every snapshot. */
+    private final Map<String, String[]> debugCache = new ConcurrentHashMap<>();
 
     private String writeFly(String dim, class_1297 e) {
         Json f = new Json(16384);
@@ -165,9 +169,17 @@ final class Sampler {
 
         Object mind = FlyBridge.mind(e);
         Object hudExtra = Refl.call(mind, "hudExtra");
-        Object state = Refl.call(mind, "state");
         if (hudExtra != null) f.field("hudExtra", hudExtra.toString());
-        if (state != null) f.field("state", state.toString());
+        String id = e.method_5667().toString();
+        String[] dbg = debugCache.get(id);
+        if (dbg == null || tick % 20 == 0) {
+            Object state = Refl.call(mind, "state");
+            Object debug = Refl.call(e, "debugState");
+            dbg = new String[]{state == null ? null : state.toString(), debug == null ? null : debug.toString()};
+            debugCache.put(id, dbg);
+        }
+        if (dbg[0] != null) f.field("state", dbg[0]);
+        if (dbg[1] != null) f.field("debug", dbg[1]);
         f.field("fleeing", Refl.bool(Refl.call(mind, "fleeing")));
         f.field("drinking", Refl.bool(Refl.call(mind, "isDrinking")));
         f.key("mind");
